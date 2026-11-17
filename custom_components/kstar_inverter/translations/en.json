@@ -1,0 +1,33 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Kstar Inverter (RS485)",
+        "description": "Configure your USB-to-RS485 adapter and Modbus address. Ensure the inverter's 485 protocol is set to MODBUS (1).",
+        "data": {
+          "serial_port": "Serial Port Path (e.g., /dev/ttyUSB0)",
+          "baudrate": "Baud Rate (bps)",
+          "slave_id": "Inverter Modbus Address (1-32)",
+          "scan_interval": "Polling Interval (seconds)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to the Kstar inverter over RS485. Verify wiring, baud rate, slave ID, and that the inverter protocol is set to MODBUS.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This inverter is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Kstar Inverter Options",
+        "data": {
+          "scan_interval": "Polling Interval (seconds)"
+        }
+      }
+    }
+  }
+}
