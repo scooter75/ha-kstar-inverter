@@ -1,15 +1,24 @@
-"""Constants for the Kstar Inverter RS485 Modbus integration."""
+"""Constants for the Kstar Inverter Modbus integration."""
 
 DOMAIN = "kstar_inverter"
 
+CONF_CONNECTION_TYPE = "connection_type"
 CONF_SERIAL_PORT = "serial_port"
 CONF_BAUDRATE = "baudrate"
+CONF_HOST = "host"
+CONF_PORT = "port"
 CONF_SLAVE_ID = "slave_id"
 CONF_SCAN_INTERVAL = "scan_interval"
 
+CONN_TYPE_SERIAL = "serial"
+CONN_TYPE_TCP = "tcp"
+
 DEFAULT_NAME = "Kstar Inverter"
+DEFAULT_CONNECTION_TYPE = CONN_TYPE_SERIAL
 DEFAULT_SERIAL_PORT = "/dev/ttyUSB0"
 DEFAULT_BAUDRATE = 9600
+DEFAULT_HOST = "192.168.1.100"
+DEFAULT_TCP_PORT = 502
 DEFAULT_SLAVE_ID = 1
 DEFAULT_SCAN_INTERVAL = 10
 

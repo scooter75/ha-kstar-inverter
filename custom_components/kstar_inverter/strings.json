@@ -2,7 +2,14 @@
   "config": {
     "step": {
       "user": {
-        "title": "Connect to Kstar Inverter (RS485)",
+        "title": "Kstar Inverter Connection Method",
+        "description": "Choose whether to connect via a local USB-to-RS485 adapter or over TCP (e.g., Waveshare / Elfin RS485-to-Ethernet/Wi-Fi gateway).",
+        "data": {
+          "connection_type": "Connection Type"
+        }
+      },
+      "serial": {
+        "title": "Connect via RS485 Serial",
         "description": "Configure your USB-to-RS485 adapter and Modbus address. Ensure the inverter's 485 protocol is set to MODBUS (1).",
         "data": {
           "serial_port": "Serial Port Path (e.g., /dev/ttyUSB0)",
@@ -10,10 +17,20 @@
           "slave_id": "Inverter Modbus Address (1-32)",
           "scan_interval": "Polling Interval (seconds)"
         }
+      },
+      "tcp": {
+        "title": "Connect via Modbus over TCP",
+        "description": "Configure your RS485-to-TCP gateway IP address and port (set gateway mode to Modbus TCP -> RTU).",
+        "data": {
+          "host": "Gateway IP Address / Hostname",
+          "port": "TCP Port (default 502)",
+          "slave_id": "Inverter Modbus Address (1-32)",
+          "scan_interval": "Polling Interval (seconds)"
+        }
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to the Kstar inverter over RS485. Verify wiring, baud rate, slave ID, and that the inverter protocol is set to MODBUS.",
+      "cannot_connect": "Failed to connect to the Kstar inverter. Verify wiring/network, slave ID, and that the inverter protocol is set to MODBUS.",
       "unknown": "Unexpected error occurred."
     },
     "abort": {

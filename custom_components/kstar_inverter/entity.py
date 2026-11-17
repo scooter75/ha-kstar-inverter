@@ -21,7 +21,7 @@ class KstarEntity(CoordinatorEntity[KstarDataUpdateCoordinator]):
         model = coordinator.system_info.get("machine_model", "KSG Series")
         fw = coordinator.system_info.get("firmware_version")
 
-        identifier = f"{coordinator.client.port}_{coordinator.client.slave_id}"
+        identifier = f"{coordinator.client.endpoint_id}_{coordinator.client.slave_id}"
         self._attr_unique_id = f"{identifier}_{key}"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, identifier)},

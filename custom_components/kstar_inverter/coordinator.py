@@ -15,7 +15,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class KstarDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
-    """Class to manage fetching Kstar inverter data over RS485."""
+    """Class to manage fetching Kstar inverter data over Modbus."""
 
     def __init__(
         self,

@@ -1,4 +1,4 @@
-"""The Kstar Inverter (RS485 Modbus) integration."""
+"""The Kstar Inverter (RS485 / TCP Modbus) integration."""
 from __future__ import annotations
 
 import logging
@@ -9,12 +9,19 @@ from homeassistant.core import HomeAssistant
 
 from .const import (
     CONF_BAUDRATE,
+    CONF_CONNECTION_TYPE,
+    CONF_HOST,
+    CONF_PORT,
     CONF_SCAN_INTERVAL,
     CONF_SERIAL_PORT,
     CONF_SLAVE_ID,
+    CONN_TYPE_SERIAL,
+    CONN_TYPE_TCP,
     DEFAULT_BAUDRATE,
     DEFAULT_SCAN_INTERVAL,
+    DEFAULT_SERIAL_PORT,
     DEFAULT_SLAVE_ID,
+    DEFAULT_TCP_PORT,
     DOMAIN,
 )
 from .coordinator import KstarDataUpdateCoordinator
@@ -32,15 +39,28 @@ PLATFORMS: list[Platform] = [
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Kstar Inverter from a config entry."""
-    port = entry.data[CONF_SERIAL_PORT]
-    baudrate = entry.data.get(CONF_BAUDRATE, DEFAULT_BAUDRATE)
+    conn_type = entry.data.get(CONF_CONNECTION_TYPE, CONN_TYPE_SERIAL)
     slave_id = entry.data.get(CONF_SLAVE_ID, DEFAULT_SLAVE_ID)
     scan_interval = entry.options.get(
         CONF_SCAN_INTERVAL,
         entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL),
     )
 
-    client = KstarModbusClient(port=port, baudrate=baudrate, slave_id=slave_id)
+    if conn_type == CONN_TYPE_TCP:
+        client = KstarModbusClient(
+            connection_type=CONN_TYPE_TCP,
+            slave_id=slave_id,
+            host=entry.data[CONF_HOST],
+            tcp_port=entry.data.get(CONF_PORT, DEFAULT_TCP_PORT),
+        )
+    else:
+        client = KstarModbusClient(
+            connection_type=CONN_TYPE_SERIAL,
+            slave_id=slave_id,
+            serial_port=entry.data.get(CONF_SERIAL_PORT, DEFAULT_SERIAL_PORT),
+            baudrate=entry.data.get(CONF_BAUDRATE, DEFAULT_BAUDRATE),
+        )
+
     system_info = await client.read_system_info()
 
     coordinator = KstarDataUpdateCoordinator(

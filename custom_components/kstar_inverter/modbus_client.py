@@ -1,4 +1,4 @@
-"""Modbus RTU client wrapper for Kstar KSG1-250K Inverter (Protocol V3.5)."""
+"""Modbus RTU / TCP client wrapper for Kstar KSG1-250K Inverter (Protocol V3.5)."""
 from __future__ import annotations
 
 import asyncio
@@ -6,10 +6,14 @@ import logging
 import struct
 from typing import Any
 
-from pymodbus.client import AsyncModbusSerialClient
+from pymodbus.client import AsyncModbusSerialClient, AsyncModbusTcpClient
 from pymodbus.exceptions import ModbusException
 
 from .const import (
+    CONN_TYPE_TCP,
+    DEFAULT_BAUDRATE,
+    DEFAULT_SERIAL_PORT,
+    DEFAULT_TCP_PORT,
     DSP_ALARM_CODES,
     DSP_ERROR_CODES,
     INVERTER_MODELS,
@@ -50,31 +54,54 @@ def _regs_to_ascii(regs: list[int]) -> str:
 
 
 class KstarModbusClient:
-    """Async Modbus RTU client for Kstar Inverters."""
+    """Async Modbus client supporting RS485 Serial RTU and Modbus over TCP."""
 
-    def __init__(self, port: str, baudrate: int, slave_id: int) -> None:
+    def __init__(
+        self,
+        connection_type: str,
+        slave_id: int,
+        serial_port: str = DEFAULT_SERIAL_PORT,
+        baudrate: int = DEFAULT_BAUDRATE,
+        host: str = "",
+        tcp_port: int = DEFAULT_TCP_PORT,
+    ) -> None:
         """Initialize the Modbus client."""
-        self.port = port
-        self.baudrate = baudrate
+        self.connection_type = connection_type
         self.slave_id = slave_id
+        self.serial_port = serial_port
+        self.baudrate = baudrate
+        self.host = host
+        self.tcp_port = tcp_port
         self._lock = asyncio.Lock()
-        self._client = AsyncModbusSerialClient(
-            port=port,
-            baudrate=baudrate,
-            bytesize=8,
-            parity="N",
-            stopbits=1,
-            timeout=3,
-        )
+
+        if connection_type == CONN_TYPE_TCP:
+            self.endpoint_id = f"{host}:{tcp_port}"
+            self._client: AsyncModbusSerialClient | AsyncModbusTcpClient = (
+                AsyncModbusTcpClient(
+                    host=host,
+                    port=tcp_port,
+                    timeout=3,
+                )
+            )
+        else:
+            self.endpoint_id = serial_port
+            self._client = AsyncModbusSerialClient(
+                port=serial_port,
+                baudrate=baudrate,
+                bytesize=8,
+                parity="N",
+                stopbits=1,
+                timeout=3,
+            )
 
     async def connect(self) -> bool:
-        """Connect to the RS485 serial port."""
+        """Connect to the RS485 serial port or TCP endpoint."""
         if not self._client.connected:
             return await self._client.connect()
         return True
 
     async def close(self) -> None:
-        """Close the RS485 serial port."""
+        """Close the Modbus connection."""
         if self._client.connected:
             self._client.close()
 
@@ -148,7 +175,7 @@ class KstarModbusClient:
         """Read real-time telemetry via Function Code 0x04."""
         async with self._lock:
             if not await self.connect():
-                raise ConnectionError(f"Unable to connect to RS485 port {self.port}")
+                raise ConnectionError(f"Unable to connect to Modbus endpoint {self.endpoint_id}")
 
             # Block 1: Registers 3000 to 3060 (61 registers)
             b1 = await self._read_input_registers(3000, 61)

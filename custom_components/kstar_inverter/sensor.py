@@ -1,4 +1,4 @@
-"""Sensor platform for Kstar Inverter (RS485 Modbus)."""
+"""Sensor platform for Kstar Inverter (RS485 / TCP Modbus)."""
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -12,7 +12,6 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
-    PERCENTAGE,
     REVOLUTIONS_PER_MINUTE,
     UnitOfApparentPower,
     UnitOfElectricCurrent,
