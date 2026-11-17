@@ -2,7 +2,7 @@
   "domain": "kstar_inverter",
   "name": "Kstar Inverter (RS485 Modbus)",
   "codeowners": [
-    "@your-github-username"
+    "@scooter75"
   ],
   "config_flow": true,
   "documentation": "https://github.com/scooter75/ha-kstar-inverter",
