@@ -1,14 +1,16 @@
-# Kstar Inverter (RS485 Modbus) for Home Assistant
+# Kstar Inverter (RS485 / TCP Modbus) for Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
 
-A native custom integration for **Home Assistant** to monitor and control **Kstar KSG / BluE series solar inverters** (`1 kW – 250 kW`) over **RS485 Modbus RTU**, built strictly to the *Kstar KSG1-250K Inverter Modbus Communications Protocol V3.5*.
+A native custom integration for **Home Assistant** to monitor and control **Kstar KSG / BluE series solar inverters** (`1 kW – 250 kW`) over **RS485 Serial RTU** or **Modbus over TCP**, built strictly to the *Kstar KSG1-250K Inverter Modbus Communications Protocol V3.5*.
 
 ---
 
 ## Features
 
-* **UI Configuration (`ConfigFlow`)**: Easy setup via **Settings > Devices & Services** with live connection validation.
+* **Flexible Connectivity (`ConfigFlow`)**:
+  * **RS485 Serial RTU**: Direct connection via USB-to-RS485 adapter (`/dev/ttyUSB0`, `/dev/serial/by-id/...`).
+  * **Modbus over TCP**: Network connection via RS485-to-Ethernet or RS485-to-Wi-Fi converters (such as Waveshare RS485 to ETH,USR-TCP232, or Elfin-EW11).
 * **Home Assistant Energy Dashboard Ready**: High-resolution (`0.1 kWh`) daily and total energy yield sensors with proper `total_increasing` state classes.
 * **Real-Time Telemetry (`04H` Input Registers)**:
   * PV1, PV2, and PV3 Voltage (`V`), Current (`A`), and Power (`W`)
@@ -27,11 +29,13 @@ A native custom integration for **Home Assistant** to monitor and control **Ksta
 ## Hardware & Inverter Prerequisites
 
 1. **RS485 Wiring**:
-   * Connect **A+ (D+)** on your USB-to-RS485 adapter to **RS485 A+** on the Kstar inverter communication terminal.
-   * Connect **B- (D-)** on your USB-to-RS485 adapter to **RS485 B-** on the inverter.
+   * Connect **A+ (D+)** on your USB-to-RS485 adapter or TCP gateway to **RS485 A+** on the Kstar inverter communication terminal.
+   * Connect **B- (D-)** on your USB-to-RS485 adapter or TCP gateway to **RS485 B-** on the inverter.
 2. **Inverter Menu Settings**:
    * On the inverter's LCD menu, set **485 Protocol / Agreement** to **`MODBUS`** (value `1`, not `KSTAR`).
    * Verify the **Baud Rate** (default `9600 bps`) and **RS485 Address** (default `1`, range `1–32`).
+3. **Modbus TCP Gateway Settings (if using TCP)**:
+   * Configure your RS485-to-Ethernet/Wi-Fi adapter's serial port to `9600-8-N-1` and set its work mode to **Modbus TCP to RTU** (default TCP port `502`).
 
 ---
 
@@ -39,8 +43,8 @@ A native custom integration for **Home Assistant** to monitor and control **Ksta
 
 1. Open **HACS** in your Home Assistant instance.
 2. Click the three dots (`⋮`) in the top-right corner and select **Custom repositories**.
-3. Paste the URL of this GitHub repository and select **Integration** as the category.
-4. Click **Add**, search for **Kstar Inverter (RS485 Modbus)**, and click **Download**.
+3. Paste `https://github.com/scooter75/ha-kstar-inverter` and select **Integration** as the category.
+4. Click **Add**, search for **Kstar Inverter (RS485 / TCP Modbus)**, and click **Download**.
 5. **Restart Home Assistant**.
 
 ### Manual Installation
@@ -55,12 +59,10 @@ A native custom integration for **Home Assistant** to monitor and control **Ksta
 
 1. In Home Assistant, go to **Settings > Devices & Services**.
 2. Click **+ Add Integration** in the bottom-right corner.
-3. Search for **Kstar Inverter (RS485 Modbus)**.
-4. Enter your RS485 parameters:
-   * **Serial Port Path**: e.g. `/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0` or `/dev/ttyUSB0`
-   * **Baud Rate**: `9600` (default)
-   * **Inverter Modbus Address**: `1` (default)
-   * **Polling Interval**: `10` seconds (default)
+3. Search for **Kstar Inverter (RS485 / TCP Modbus)**.
+4. Choose **RS485 Serial** or **Modbus over TCP**:
+   * **Serial**: Enter Serial Port Path (e.g., `/dev/serial/by-id/...`), Baud Rate (`9600`), Inverter Modbus Address (`1`), and Polling Interval (`10`s).
+   * **TCP**: Enter Gateway IP Address, TCP Port (`502`), Inverter Modbus Address (`1`), and Polling Interval (`10`s).
 
 > **Note:** Many string inverters power down their communication board at night when PV voltage drops to zero. During nighttime or `System Initialization`, sensors may report `Unavailable` until sunrise.
 
@@ -70,6 +72,9 @@ A native custom integration for **Home Assistant** to monitor and control **Ksta
 
 ```text
 ha-kstar-inverter/
+├── .github/
+│   └── workflows/
+│       └── validate.yml
 ├── hacs.json
 ├── README.md
 └── custom_components/
