@@ -1,0 +1,15 @@
+{
+  "domain": "kstar_inverter",
+  "name": "Kstar Inverter (RS485 Modbus)",
+  "codeowners": [
+    "@your-github-username"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/scooter75/ha-kstar-inverter",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/scooter75/ha-kstar-inverter/issues",
+  "requirements": [
+    "pymodbus>=3.6.0"
+  ],
+  "version": "1.0.0"
+}
